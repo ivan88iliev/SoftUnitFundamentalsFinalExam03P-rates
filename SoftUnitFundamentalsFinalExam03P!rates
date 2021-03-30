@@ -1,0 +1,87 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+
+namespace SoftUnitFundamentalsFinalExam
+{
+    class Program
+    {
+        private static string casint;
+
+        static void Main(string[] args)
+        {
+            //SoftUnitFundamentalsFinalExam03P!rates
+
+            Dictionary<string, int[]> piratesList = new Dictionary<string, int[]>();
+
+            while (true)
+            {
+                string[] command = Console.ReadLine().Split("||").ToArray();//{town}=>{people}=>{gold}
+                if (command[0] == "Sail")
+                {
+                    break;
+                }
+                int people = int.Parse(command[1]);
+                int gold = int.Parse(command[2]);
+
+                if (piratesList.ContainsKey(command[0]))
+                {
+                    piratesList[command[0]][0] += people;
+                    piratesList[command[0]][1] += gold;
+                    continue;
+                }
+                piratesList.Add(command[0], new int[] { people, gold });
+
+            }
+
+            while (true)
+            {
+                string[] commandTwo = Console.ReadLine().Split("=>").ToArray();
+                if (commandTwo[0] == "End")
+                {
+                    break;
+                }
+                switch (commandTwo[0])
+                {
+                    case "Plunder"://Plunder=>{town}=>{people}=>{gold}
+                        piratesList[commandTwo[1]][0] -= int.Parse(commandTwo[2]);// [0] = people
+                        piratesList[commandTwo[1]][1] -= int.Parse(commandTwo[3]);// [1] = gold
+                        Console.WriteLine($"{commandTwo[1]} plundered! {commandTwo[3]} gold stolen, {commandTwo[2]} citizens killed.");
+                        if (piratesList[commandTwo[1]][0] <= 0 || piratesList[commandTwo[1]][1] <= 0)
+                        {
+                            piratesList.Remove(commandTwo[1]);
+                            Console.WriteLine($"{commandTwo[1]} has been wiped off the map!");
+                        }
+                        break;
+                
+                    case "Prosper"://Prosper=>{town}=>{gold}
+                        if (int.Parse(commandTwo[2]) < 0)
+                        {
+                            Console.WriteLine("Gold added cannot be a negative number!");
+                            break;
+                        }
+                        piratesList[commandTwo[1]][1] += int.Parse(commandTwo[2]);
+                        Console.WriteLine($"{commandTwo[2]} gold added to the city treasury. {commandTwo[1]} now has {piratesList[commandTwo[1]][1]} gold.");
+                        break;
+                }
+
+
+            }
+
+            if (piratesList.Count == 0)
+            {
+                Console.WriteLine($"Ahoy, Captain! All targets have been plundered and destroyed!");
+            }
+            else
+            {
+                Console.WriteLine($"Ahoy, Captain! There are {piratesList.Count} wealthy settlements to go to:");
+                foreach (var item in piratesList.OrderBy(x=>x.Key).OrderByDescending(x=>x.Value[1]))
+                {
+                    Console.WriteLine($"{item.Key} -> Population: {item.Value[0]} citizens, Gold: {item.Value[1]} kg");
+                }
+            }
+            //
+        }
+    }
+}
